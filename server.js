@@ -8,6 +8,7 @@ app.get('/', homeHandler);
 
 function homeHandler(req, res) {
     let obj = moviesData;
+    //comment the line below then run the server to simulate a 500 server error 
     let mov = new Movie(obj.title, obj.poster_path, obj.overview);
     res.json(mov);
 }
@@ -24,12 +25,20 @@ function favoriteHandler(req, res) {
 }
 
 app.use((req, res) => {
-    res.status(404).send('Page Not Found');
+    res.status(404).send({
+        "status": '404',
+        "responseText": "Sorry, something went wrong"
+    });
 });
 
-app.use((req, res) => {
-    res.status(500).send('Sorry, something went wrong');
-});
+function handleServerError(err, req, res, next) {
+    res.status(500);
+    res.json({
+        "status": 500,
+        "responseText": "Sorry, something went wrong"
+    });
+}
+app.use(handleServerError);
 
 
 app.listen(port, () => {
