@@ -1,45 +1,99 @@
+'use strict';
 const express = require('express');
-
 const app = express();
-const port = 3001;
-const moviesData = require('./Movie Data/data.json');
+require('dotenv').config()
+const axios = require('axios');
 
+const cors = require('cors');
+const port = process.env.PORT
+const apiKey = process.env.API_KEY
+
+//routes
 app.get('/', homeHandler);
+app.get(`/trending`, trendingHandler);
+app.get('/search', searchHandler);
+app.get(`/tv_series`, TopRatedTv_series)
+app.get(`/series_provider`, Tv_series_provider)
 
+
+//functions
 function homeHandler(req, res) {
-    let obj = moviesData;
-    //comment the line below then run the server to simulate a 500 server error 
-    let mov = new Movie(obj.title, obj.poster_path, obj.overview);
-    res.json(mov);
+    res.send("Home page");
 }
 
-function Movie(title, path, overview) {
+function trendingHandler(req, res) {
+    let url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}&language=en-US`
+    axios.get(url)
+        .then(result => {
+            let trenMovies = result.data.results.map(movie => {
+                return new Movies(movie.id, movie.title, movie.release_date, movie.poster_path, movie.overview);
+            })
+            res.json(trenMovies);
+        })
+        .catch(error => {
+            console.log(error);
+        })
+}
+
+function searchHandler(req, res) {
+    let movieName = `super man`;
+    let url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&language=en-US&query=${movieName}`
+    axios.get(url)
+        .then(result => {
+            let searchedMovies = result.data.results.map(movie => {
+                return new Movies(movie.id, movie.title, movie.release_date, movie.poster_path, movie.overview);
+            })
+            res.json(searchedMovies);
+        })
+        .catch(error => {
+            console.log(error);
+        })
+}
+
+
+function TopRatedTv_series(req, res) {
+    let url = `https://api.themoviedb.org/3/tv/top_rated?api_key=${apiKey}`
+    axios.get(url)
+        .then(result => {
+            let tv_series = result.data.results.map(series => {
+                return new Movies(series.id, series.original_name, series.first_air_date, series.poster_path, series.overview);
+            })
+            res.json(tv_series);
+        })
+        .catch(error => {
+            console.log(error);
+        })
+}
+
+function Tv_series_provider(req, res) {
+    //taking data from the first API that will return the top tv series then 
+    // feed the id of each series to the second API an input to return where can we watch each series 
+    let seriesUrl = `https://api.themoviedb.org/3/tv/top_rated?api_key=${apiKey}`
+    axios.get(seriesUrl)
+        .then(result => {
+            let tv_series = result.data.results.map(series => {
+                return series.id;
+            })
+             axios.get(`https://api.themoviedb.org/3/tv/${tv_series}/watch/providers?api_key=${apiKey}`)
+             .then(result => {
+                 res.json(result.data)
+             })
+             .catch(error => {
+                 console.log(error)
+             })
+        })
+        .catch(error => {
+            console.log(error);
+        })
+}
+
+function Movies(id, title, date, path, overview) {
+    this.id = id;
     this.title = title;
+    this.date = date;
     this.path = path;
     this.overview = overview;
 }
-
-app.get('/favorite', favoriteHandler);
-function favoriteHandler(req, res) {
-    res.json("Welcome to Favorite Page");
-}
-
-app.use((req, res) => {
-    res.status(404).send({
-        "status": '404',
-        "responseText": "Sorry, something went wrong"
-    });
-});
-
-function handleServerError(err, req, res, next) {
-    res.status(500);
-    res.json({
-        "status": 500,
-        "responseText": "Sorry, something went wrong"
-    });
-}
-app.use(handleServerError);
-
 
 app.listen(port, () => {
     console.log(`my app is running and  listening on port ${port}`)
