@@ -18,3 +18,5 @@ This project handles a simple request and response in the server side using Node
 ## Project Features
 - Status code error handeling, it covers the basic cases with 404 and 500 codes and handels them accordingly.
 - The website has two main endpoints with coresponding data for each endpoint.
+
+
