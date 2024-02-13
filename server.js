@@ -9,6 +9,9 @@ const port = process.env.PORT
 const apiKey = process.env.API_KEY
 
 //routes
+=======
+const moviesData = require('./Movie Data/data.json');
+//Lab11
 app.get('/', homeHandler);
 app.get(`/trending`, trendingHandler);
 app.get('/search', searchHandler);
