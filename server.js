@@ -52,7 +52,7 @@ function getMoviesHandler(req, res) {
         res.status(500).json({ error: 'Internal Server Error' });
     })
 }
- function addMovieHandler(req, res) {
+function addMovieHandler(req, res) {
     const { title, duration, overview, comment } = req.body
     const sql = `INSERT INTO movie(title, duration, overview,comment)
      VALUES($1, $2 ,$3 ,$4 ) RETURNING *;`;
