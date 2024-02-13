@@ -1,46 +1,80 @@
+'use strict';
 const express = require('express');
-
 const app = express();
+// <<<<<<< Lab11
 const port = 3001;
 const moviesData = require('./Movie Data/data.json');
 //Lab11
 app.get('/', homeHandler);
+=======
+require('dotenv').config();
+const bodyParser = require('body-parser')
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
+const port = process.env.PORT || 3000;
 
-function homeHandler(req, res) {
-    let obj = moviesData;
-    //comment the line below then run the server to simulate a 500 server error 
-    let mov = new Movie(obj.title, obj.poster_path, obj.overview);
-    res.json(mov);
+const { Client } = require('pg')
+const url = `postgres://abdelrahman:1997@localhost:5432/movies`
+const client = new Client(url)
+// >>>>>>> main
+
+//routes
+app.get(`/getMovies`, getMoviesHandler);
+app.post(`/addMovies`, addMovieHandler);
+app.patch('/update/:movieId', updateHandler)
+app.get(`/delete/:id`, deleteHandler)
+app.get(`/get/:movie`, movieHandler)
+
+//functions
+function movieHandler(req, res) {
+    let { movie } = req.params;
+    let sql = `SELECT * FROM movie WHERE id=$1;`;
+    client.query(sql, [movie]).then(result => {
+        res.json(result.rows)
+    }).catch()
 }
-
-function Movie(title, path, overview) {
-    this.title = title;
-    this.path = path;
-    this.overview = overview;
+function deleteHandler(req, res) {
+    const { id } = req.params;
+    let sql = 'DELETE FROM movie WHERE id = $1;';
+    client.query(sql, [id]).then(result => {
+        res.send("Deleted Sucssefully");
+    }).catch()
 }
-
-app.get('/favorite', favoriteHandler);
-function favoriteHandler(req, res) {
-    res.json("Welcome to Favorite Page");
+function updateHandler(req, res) {
+    let mvId = req.params.movieId;
+    let { comment } = req.body;
+    let sql = `UPDATE movie
+    SET comment = $1
+    WHERE id = $2 RETURNING *;`;
+    let values = [comment, mvId];
+    client.query(sql, values).then(resutl => {
+        res.json(resutl.rows);
+    }).catch()
 }
-
-app.use((req, res) => {
-    res.status(404).send({
-        "status": '404',
-        "responseText": "Sorry, something went wrong"
-    });
-});
-
-function handleServerError(err, req, res, next) {
-    res.status(500);
-    res.json({
-        "status": 500,
-        "responseText": "Sorry, something went wrong"
-    });
+function getMoviesHandler(req, res) {
+    const sql = `SELECT * FROM movie;`;
+    client.query(sql).then(data => {
+        res.json(data.rows)
+    }).catch(error => {
+        res.status(500).json({ error: 'Internal Server Error' });
+    })
 }
-app.use(handleServerError);
-
-
-app.listen(port, () => {
-    console.log(`my app is running and  listening on port ${port}`)
+ function addMovieHandler(req, res) {
+    const { title, duration, overview, comment } = req.body
+    const sql = `INSERT INTO movie(title, duration, overview,comment)
+     VALUES($1, $2 ,$3 ,$4 ) RETURNING *;`;
+    const values = [title, duration, overview, comment];
+    client.query(sql, values).then(result => {
+        console.log(result.rows);
+        res.status(201).json(result.rows)
+    }).catch(error => {
+        res.status(500).json({ error: 'Internal Server Error' });
+    })
+}
+client.connect().then(() => {
+    app.listen(port, () => {
+        console.log(`listening to port ${port}`);
+    })
+}).catch(error => {
+    res.status(500).json({ error: 'Internal Server Error' });
 })
