@@ -10,14 +10,12 @@ const port = process.env.PORT || 3000;
 const { Client } = require('pg')
 const url = `postgres://hqxgxihz:vCuMEPCAveHTNSyV1Sd6mguEmxIb_RtS@trumpet.db.elephantsql.com/hqxgxihz`
 const client = new Client(url)
-
 //routes
 app.get(`/getMovies`, getMoviesHandler);
 app.post(`/addMovies`, addMovieHandler);
 app.patch('/update/:movieId', updateHandler)
 app.get(`/delete/:id`, deleteHandler)
 app.get(`/get/:movie`, movieHandler)
-
 //functions
 function movieHandler(req, res) {
     let { movie } = req.params;
