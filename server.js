@@ -6,7 +6,7 @@ const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 const port = process.env.PORT || 3000;
-
+//lab14
 const { Client } = require('pg')
 const url = `postgres://hqxgxihz:vCuMEPCAveHTNSyV1Sd6mguEmxIb_RtS@trumpet.db.elephantsql.com/hqxgxihz`
 const client = new Client(url)
