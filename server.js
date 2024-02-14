@@ -8,7 +8,7 @@ app.use(bodyParser.json())
 const port = process.env.PORT || 3000;
 
 const { Client } = require('pg')
-const url = `postgres://abdelrahman:1997@localhost:5432/movies`
+const url = `postgres://hqxgxihz:vCuMEPCAveHTNSyV1Sd6mguEmxIb_RtS@trumpet.db.elephantsql.com/hqxgxihz`
 const client = new Client(url)
 
 //routes
