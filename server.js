@@ -5,7 +5,7 @@ require('dotenv').config();
 const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3003;
 const cors = require('cors');
 
 const { Client } = require('pg')
@@ -35,7 +35,7 @@ function getMoviesHandler(req, res) {
 
 function addMovieHandler(req, res) {
     const { title, duration, overview, comment } = req.body
-    const sql = `INSERT INTO movie(title, overview,release_date,poster_path,comments)
+    const sql = `INSERT INTO movie(title, overview,release_date,poster_path,comment)
      VALUES($1, $2 ,$3 ,$4 ,$5) RETURNING *;`;
     const values = [title, overview, release_date, poster_path,comments];
     client.query(sql, values).then(result => {

@@ -4,5 +4,5 @@ CREATE TABLE movie(
     overview text,
     release_date DATE,
     poster_path VARCHAR(255),
-    comments  VARCHAR(255)
+    comment  VARCHAR(255)
 );
