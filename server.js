@@ -35,9 +35,9 @@ function getMoviesHandler(req, res) {
 
 function addMovieHandler(req, res) {
     const { title, duration, overview, comment } = req.body
-    const sql = `INSERT INTO movie(title, duration, overview,comment)
-     VALUES($1, $2 ,$3 ,$4 ) RETURNING *;`;
-    const values = [title, duration, overview, comment];
+    const sql = `INSERT INTO movie(title, overview,release_date,poster_path,comments)
+     VALUES($1, $2 ,$3 ,$4 ,$5) RETURNING *;`;
+    const values = [title, overview, release_date, poster_path,comments];
     client.query(sql, values).then(result => {
         console.log(result.rows);
         res.status(201).json(result.rows)
