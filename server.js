@@ -6,10 +6,13 @@ const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 const port = process.env.PORT || 3000;
+const cors = require('cors');
 
 const { Client } = require('pg')
 const url = `postgres://abdelrahman:1997@localhost:5432/movies`
 const client = new Client(url)
+
+app.use(cors());
 
 //routes
 app.get('/', homeHandler);
