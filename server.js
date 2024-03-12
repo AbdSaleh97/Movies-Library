@@ -33,11 +33,11 @@ function deleteHandler(req, res) {
 }
 function updateHandler(req, res) {
     let mvId = req.params.movieId;
-    let { comment } = req.body;
+    let { comments } = req.body;
     let sql = `UPDATE movie
-    SET comment = $1
+    SET comments = $1
     WHERE id = $2 RETURNING *;`;
-    let values = [comment, mvId];
+    let values = [comments, mvId];
     client.query(sql, values).then(resutl => {
         res.json(resutl.rows);
     }).catch()
@@ -51,10 +51,10 @@ function getMoviesHandler(req, res) {
     })
 }
 function addMovieHandler(req, res) {
-    const { title, duration, overview, comment } = req.body
-    const sql = `INSERT INTO movie(title, duration, overview,comment)
-     VALUES($1, $2 ,$3 ,$4 ) RETURNING *;`;
-    const values = [title, duration, overview, comment];
+    const { title, overview, release_date, poster_path, comments } = req.body
+    const sql = `INSERT INTO movie(title, overview,release_date,poster_path,comments)
+    VALUES($1, $2 ,$3 ,$4 ,$5) RETURNING *;`;
+    const values = [title, overview, release_date, poster_path, comments];
     client.query(sql, values).then(result => {
         console.log(result.rows);
         res.status(201).json(result.rows)
